@@ -1,0 +1,172 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "cfn-ci",
+    "Parameters": {
+        "OS": {
+            "Description": "OS to test on",
+            "Type": "String",
+            "AllowedValues" : ["centos7", "ubuntu1404"]
+        },
+        "Label": {
+            "Description": "Label for CI job when posted back to GitHub",
+            "Type": "String",
+            "MinLength": 1
+        },
+        "UserData": {
+            "Description": "Test script to run",
+            "Type": "String",
+            "MinLength": 1
+        },
+        "GitSha": {
+            "Description": "Git commit sha to post status to",
+            "Type": "String",
+            "MinLength": 40
+        },
+        "GithubRepo": {
+            "Description": "GitHub repo to post status to",
+            "Type": "String",
+            "AllowedPattern": "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"
+        },
+        "GithubAccessToken": {
+            "Description": "GitHub access token with repo:status scope",
+            "Type": "String",
+            "MinLength": 1
+        }
+    },
+    "Resources": {
+        "ec2": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": "tilestream",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    }
+                ],
+                "InstanceType": "m3.large",
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "OsToAmi",
+                        {
+                            "Ref": "OS"
+                        },
+                        "AMI"
+                    ]
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash",
+                                "set -x",
+                                "exec > >(tee /var/log/user-data.log | logger -t user-data -s 2> /dev/console) 2>&1",
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "export Label='",
+                                            {
+                                                "Ref": "Label"
+                                            },
+                                            "'"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "export GitSha=",
+                                            {
+                                                "Ref": "GitSha"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "export GithubRepo=",
+                                            {
+                                                "Ref": "GithubRepo"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "export GithubAccessToken=",
+                                            {
+                                                "Ref": "GithubAccessToken"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "export waithandle='",
+                                            {
+                                                "Ref": "waithandle"
+                                            },
+                                            "'"
+                                        ]
+                                    ]
+                                },
+                                "echo \"",
+                                {
+                                    "Ref": "UserData"
+                                },
+                                "\" > /tmp/test-script.sh",
+                                "chmod a+x /tmp/test-script.sh",
+                                "if /tmp/test-script.sh &> /tmp/test-script.log; then",
+                                "    export STATE=success",
+                                "else",
+                                "    export STATE=failure",
+                                "fi",
+                                "set -eu",
+                                "export GistURL=$(curl -X POST -d \"{\\\"files\\\":{\\\"test-script.log\\\":{\\\"content\\\":\\\"$(cat /tmp/test-script.log | tr -d '\"')\\\"}}}\" https://api.github.com/gists | grep -oE 'https://gist.github.com/[0-9a-f]+' | head -n1)",
+                                "curl -H \"Authorization: token $GithubAccessToken\" -X POST -d \"{\\\"state\\\":\\\"$STATE\\\",\\\"description\\\":\\\"$Label $STATE\\\",\\\"target_url\\\":\\\"$GistURL\\\"}\" \"https://api.github.com/repos/$GithubRepo/statuses/$GitSha\"",
+                                "curl -s -X PUT -H 'Content-Type:' --data-binary '{\"Status\": \"SUCCESS\", \"Reason\" :\"Build Complete\", \"UniqueId\": \"Done\", \"Data\": \"Build Complete\"}' \"$waithandle\""
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "waithandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        },
+        "waitcondition": {
+            "DependsOn": [
+                "ec2"
+            ],
+            "Type": "AWS::CloudFormation::WaitCondition",
+            "Properties": {
+                "Count": 1,
+                "Handle": {
+                    "Ref": "waithandle"
+                },
+                "Timeout": 600
+            }
+        }
+    },
+    "Mappings": {
+        "OsToAmi": {
+            "centos7": {
+                "AMI": "ami-a2f929ca"
+            },
+            "ubuntu1404": {
+                "AMI": "ami-52a3153a"
+            }
+        }
+    }
+}
