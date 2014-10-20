@@ -134,7 +134,7 @@
                                 "fi",
                                 "set -eu",
                                 "export GistURL=$(curl -X POST -d \"{\\\"files\\\":{\\\"test-script.log\\\":{\\\"content\\\":\\\"$(cat /tmp/test-script.log | tr -d '\"')\\\"}}}\" https://api.github.com/gists | grep -oE 'https://gist.github.com/[0-9a-f]+' | head -n1)",
-                                "curl -H \"Authorization: token $GithubAccessToken\" -X POST -d \"{\\\"state\\\":\\\"$STATE\\\",\\\"description\\\":\\\"$Label $STATE\\\",\\\"target_url\\\":\\\"$GistURL\\\"}\" \"https://api.github.com/repos/$GithubRepo/statuses/$GitSha\"",
+                                "curl -H \"Authorization: token $GithubAccessToken\" -X POST -d \"{\\\"state\\\":\\\"$STATE\\\",\\\"description\\\":\\\"$Label $STATE\\\",\\\"target_url\\\":\\\"$GistURL\\\",\\\"context\\\":\\\"continuous-integration/$Label\\\"}\" \"https://api.github.com/repos/$GithubRepo/statuses/$GitSha\"",
                                 "curl -s -X PUT -H 'Content-Type:' --data-binary '{\"Status\": \"SUCCESS\", \"Reason\" :\"Build Complete\", \"UniqueId\": \"Done\", \"Data\": \"Build Complete\"}' \"$waithandle\""
                             ]
                         ]
