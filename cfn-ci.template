@@ -133,8 +133,12 @@
                                 "    export STATE=failure",
                                 "fi",
                                 "set -eu",
-                                "export GistURL=$(curl -X POST -d \"{\\\"files\\\":{\\\"test-script.log\\\":{\\\"content\\\":\\\"$(cat /tmp/test-script.log | tr -d '\"')\\\"}}}\" https://api.github.com/gists | grep -oE 'https://gist.github.com/[0-9a-f]+' | head -n1)",
-                                "curl -H \"Authorization: token $GithubAccessToken\" -X POST -d \"{\\\"state\\\":\\\"$STATE\\\",\\\"description\\\":\\\"$Label $STATE\\\",\\\"target_url\\\":\\\"$GistURL\\\",\\\"context\\\":\\\"continuous-integration/$Label\\\"}\" \"https://api.github.com/repos/$GithubRepo/statuses/$GitSha\"",
+                                "# install node",
+                                "curl https://s3.amazonaws.com/mapbox/apps/install-node/56874003edb39a0c0126d07a593e836b0627ccaf/run | NV=0.10.30 NP=linux OD=/tmp BO=true sh",
+                                "/tmp/node -e \"console.log(JSON.stringify({files:{'test-script.log':{content:require('fs').readFileSync('/tmp/test-script.log','utf8')}}}));\" > /tmp/gist.json",
+                                "export GistURL=$(curl -X POST -d @/tmp/gist.json https://api.github.com/gists | grep -oE 'https://gist.github.com/[0-9a-f]+' | head -n1)",
+                                "/tmp/node -e \"console.log(JSON.stringify({state:process.env.STATE,description:process.env.Label + ' ' + process.env.STATE, target_url: process.env.GistURL, context: 'continuous-integration/' + process.env.Label }));\" > /tmp/status.json",
+                                "curl -H \"Authorization: token $GithubAccessToken\" -X POST -d @/tmp/status.json https://api.github.com/repos/$GithubRepo/statuses/$GitSha",
                                 "curl -s -X PUT -H 'Content-Type:' --data-binary '{\"Status\": \"SUCCESS\", \"Reason\" :\"Build Complete\", \"UniqueId\": \"Done\", \"Data\": \"Build Complete\"}' \"$waithandle\""
                             ]
                         ]
