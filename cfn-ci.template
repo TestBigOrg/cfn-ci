@@ -37,7 +37,6 @@
         "ec2": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
-                "KeyName": "tilestream",
                 "Tags": [
                     {
                         "Key": "Name",
