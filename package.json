@@ -1,6 +1,6 @@
 {
   "name": "cfn-ci",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "CF template for an EC2 that reports back to GitHub statuses API",
   "main": "package.json",
   "private": true,
