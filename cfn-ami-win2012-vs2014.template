@@ -1,0 +1,54 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "template for creating win2012-vs2014 AMI",
+    "Resources": {
+        "Security": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow atlas-server-app traffic",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "3389",
+                        "ToPort": "3389",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "WindowsM3large": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-3214ac5a",
+                "InstanceType": "m3.large",
+                "KeyName": "tilestream",
+                "SecurityGroupIds": [ { "Ref": "Security" } ],
+                "Tags": [ {
+                    "Key": "Name",
+                    "Value": { "Fn::Join": [ " - ", [
+                        { "Ref": "AWS::StackName" }, "windows"
+                    ] ] }
+                } ],
+                "BlockDeviceMappings" : [
+                   {
+                      "DeviceName" : "/dev/sda1",
+                      "Ebs" : { "VolumeSize": "60" }
+                   }
+                ],
+                "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
+                    "<powershell>",
+                    "([ADSI]\"WinNT://./Administrator\").SetPassword(\"Plato1234\")",
+                    "Invoke-WebRequest http://download.microsoft.com/download/A/3/F/A3F9ABF8-9AF3-4F64-BD3C-F7ECA64EBA48/vs_professional.exe -OutFile C:\\Users\\Administrator\\Desktop\\vs_professional.exe",
+                    "</powershell>",
+                    "<persist>true</persist>"
+                ] ] } }
+            }
+        }
+    }
+}
