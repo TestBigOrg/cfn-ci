@@ -1,0 +1,111 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "cfn-win",
+    "Parameters": {
+        "OS": {
+            "Description": "AMI to use",
+            "Type": "String",
+            "AllowedValues" : ["win2012", "win2012-vs2014"]
+        },
+        "GithubAccessToken": {
+            "Description": "GitHub access token with repo:status scope",
+            "Type": "String",
+            "MinLength": 1
+        }
+    },
+    "Resources": {
+        "Security": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow atlas-server-app traffic",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "3389",
+                        "ToPort": "3389",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "WindowsM3large": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "OsToAmi",
+                        {
+                            "Ref": "OS"
+                        },
+                        "AMI"
+                    ]
+                },
+                "InstanceType": "m3.large",
+                "KeyName": "tilestream",
+                "SecurityGroupIds": [ { "Ref": "Security" } ],
+                "Tags": [ {
+                    "Key": "Name",
+                    "Value": { "Fn::Join": [ " - ", [
+                        { "Ref": "AWS::StackName" }, "windows"
+                    ] ] }
+                } ],
+                "BlockDeviceMappings" : [
+                   {
+                      "DeviceName" : "/dev/sda1",
+                      "Ebs" : { "VolumeSize": "60" }
+                   }
+                ],
+                "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
+                    "<powershell>",
+
+                    { "Fn::Join": [ "", [ "$GithubAccessToken=\"", { "Ref": "GithubAccessToken" }, "\""] ] },
+
+                    "# turn off windows firewall",
+                    "netsh advfirewall set allprofiles state off",
+
+                    "# set powershell execution policy",
+                    "set-executionpolicy -force -executionpolicy unrestricted",
+
+                    "# install chocolatey",
+                    "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
+
+                    "# install deps",
+                    "cinst msysgit",
+                    "cinst wget",
+                    "cinst 7zip",
+                    "cinst curl",
+                    "cinst cmake",
+
+                    "# for some reason 7-zip may not be in path...",
+                    "$env:path += ';' + (Get-Item 'Env:ProgramFiles').Value + '\\7-Zip'",
+                    "$env:path += ';' + 'C:\\Program Files (x86)\\Git\\bin'",
+                    "$env:path += ';' + 'C:\\Program Files (x86)\\Git\\cmd'",
+
+                    "# download mapnik-dependencies",
+                    "cd C:\\Users\\Administrator\\Desktop\\",
+                    "git clone https://github.com/mapbox/mapnik-dependencies.git",
+                    "cmd /C \".\\setup.bat 64 14 release && .\\scripts\\build.bat\" > C:\\Users\\Administrator\\Desktop\\build.log",
+
+                    "</powershell>",
+                    "<persist>true</persist>"
+                ] ] } }
+            }
+        }
+    },
+    "Mappings": {
+        "OsToAmi": {
+            "win2012": {
+                "AMI": "ami-3214ac5a"
+            },
+            "win2012-vs2014": {
+                "AMI": "ami-8ce26ce4"
+            }
+        }
+    }
+}
