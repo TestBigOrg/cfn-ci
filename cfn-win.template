@@ -62,37 +62,38 @@
                    }
                 ],
                 "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
-                    "<powershell>",
+                    "<script>",
 
-                    { "Fn::Join": [ "", [ "$GithubAccessToken=\"", { "Ref": "GithubAccessToken" }, "\""] ] },
+                    "# start on the z drive????",
+                    "cd /d Z:",
+
+                    { "Fn::Join": [ "", [ "SET GithubAccessToken=\"", { "Ref": "GithubAccessToken" }, "\""] ] },
 
                     "# turn off windows firewall",
                     "netsh advfirewall set allprofiles state off",
 
-                    "# set powershell execution policy",
-                    "set-executionpolicy -force -executionpolicy unrestricted",
-
                     "# install chocolatey",
-                    "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
+                    "@powershell -NoProfile -ExecutionPolicy unrestricted -Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" && SET PATH=%PATH%;%ALLUSERSPROFILE%\\chocolatey\\bin",
 
                     "# install deps",
-                    "cinst msysgit",
+                    "cinst git.install",
                     "cinst wget",
                     "cinst 7zip",
                     "cinst curl",
                     "cinst cmake",
+                    "SET PATH=%PATH%;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip",
+                    "setx PATH \"%PATH%;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip\" /m",
 
-                    "# for some reason 7-zip may not be in path...",
-                    "$env:path += ';' + (Get-Item 'Env:ProgramFiles').Value + '\\7-Zip'",
-                    "$env:path += ';' + 'C:\\Program Files (x86)\\Git\\bin'",
-                    "$env:path += ';' + 'C:\\Program Files (x86)\\Git\\cmd'",
+                    "PATH",
 
                     "# download mapnik-dependencies",
-                    "cd C:\\Users\\Administrator\\Desktop\\",
-                    "git clone https://github.com/mapbox/mapnik-dependencies.git",
-                    "cmd /C \".\\setup.bat 64 14 release && .\\scripts\\build.bat\" > C:\\Users\\Administrator\\Desktop\\build.log",
+                    "git clone https://github.com/mapbox/mapnik-dependencies.git Z:\\mapnik-dependencies",
 
-                    "</powershell>",
+                    "# build",
+                    "Z:\\mapnik-dependencies\\settings.bat 64 14 release",
+                    "Z:\\mapnik-dependencies\\scripts\\build_node.bat > Z:\\build.log",
+
+                    "</script>",
                     "<persist>true</persist>"
                 ] ] } }
             }
