@@ -81,6 +81,7 @@
                     "cinst 7zip",
                     "cinst curl",
                     "cinst cmake",
+                    "cinst awscli",
                     "SET PATH=%PATH%;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip",
                     "setx PATH \"%PATH%;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip\" /m",
 
@@ -90,8 +91,10 @@
                     "git clone https://github.com/mapbox/mapnik-dependencies.git Z:\\mapnik-dependencies",
 
                     "# build",
-                    "Z:\\mapnik-dependencies\\settings.bat 64 14 release",
-                    "Z:\\mapnik-dependencies\\scripts\\build_node.bat > Z:\\build.log",
+                    "cd Z:\\mapnik-dependencies",
+                    "git checkout windows",
+                    "call .\\settings-minimal.bat 64 14 release",
+                    "call .\\scripts\\build_node.bat > Z:\\build2.log",
 
                     "</script>",
                     "<persist>true</persist>"
