@@ -69,6 +69,11 @@
                 "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
                     "<script>",
                     { "Fn::Join": [ "", [ "SET GithubAccessToken=\"", { "Ref": "GithubAccessToken" }, "\""] ] },
+                    "@powershell -NoProfile -ExecutionPolicy unrestricted -Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" && SET PATH=%PATH%;%ALLUSERSPROFILE%\\chocolatey\\bin",
+                    "call cinst curl",
+                    "call cinst awscli",
+                    "SET PATH=%PATH%;C:\\Program Files\\Amazon\\AWSCLI",
+                    "setx PATH \"%PATH%;C:\\Program Files\\Amazon\\AWSCLI\" /m",
                     { "Ref": "UserData" },
                     "</script>",
                     "<persist>true</persist>"
