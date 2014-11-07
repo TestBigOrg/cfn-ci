@@ -51,7 +51,7 @@
                         "AMI"
                     ]
                 },
-                "InstanceType": "m3.large",
+                "InstanceType": "c3.large",
                 "KeyName": "tilestream",
                 "SecurityGroupIds": [ { "Ref": "Security" } ],
                 "Tags": [ {
