@@ -39,7 +39,7 @@
                 ]
             }
         },
-        "WindowsM3large": {
+        "WindowsEC2": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "ImageId": {
