@@ -7,6 +7,11 @@
             "Type": "String",
             "AllowedValues" : ["win2012", "win2012-vs2014"]
         },
+        "UserData": {
+            "Description": "Test script to run",
+            "Type": "String",
+            "MinLength": 1
+        },
         "GithubAccessToken": {
             "Description": "GitHub access token with repo:status scope",
             "Type": "String",
@@ -63,41 +68,8 @@
                 ],
                 "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
                     "<script>",
-
-                    ":: start on the z: drive, c: is not fully accessible",
-                    "cd /d Z:",
-
                     { "Fn::Join": [ "", [ "SET GithubAccessToken=\"", { "Ref": "GithubAccessToken" }, "\""] ] },
-
-                    ":: turn off windows firewall",
-                    "netsh advfirewall set allprofiles state off",
-
-                    ":: install chocolatey",
-                    "@powershell -NoProfile -ExecutionPolicy unrestricted -Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" && SET PATH=%PATH%;%ALLUSERSPROFILE%\\chocolatey\\bin",
-
-                    ":: install deps",
-                    "cinst git.install",
-                    "cinst wget",
-                    "cinst 7zip",
-                    "cinst curl",
-                    "cinst cmake",
-                    "cinst awscli",
-                    "SET PATH=%PATH%;C:\\Python27;C:\\Program Files\\Amazon\\AWSCLI;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip",
-                    "setx PATH \"%PATH%;C:\\Python27;C:\\Program Files\\Amazon\\AWSCLI;C:\\Program Files (x86)\\Git\\cmd;C:\\Program Files (x86)\\Git\\bin;C:\\Program Files\\7-Zip\" /m",
-
-                    "PATH",
-
-                    "call wget --no-check-certificate -q https://www.python.org/ftp/python/2.7.8/python-2.7.8.amd64.msi",
-                    "call msiexec /quiet /i python-2.7.8.amd64.msi",
-
-                    ":: download mapnik-dependencies",
-                    "call git clone https://github.com/mapbox/mapnik-dependencies.git Z:\\mapnik-dependencies",
-
-                    ":: build",
-                    "cd Z:\\mapnik-dependencies",
-                    "call .\\settings-minimal.bat 64 14 release > Z:\\build1.log",
-                    "call .\\scripts\\build_node.bat > Z:\\build2.log",
-
+                    { "Ref": "UserData" },
                     "</script>",
                     "<persist>true</persist>"
                 ] ] } }
