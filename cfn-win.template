@@ -92,7 +92,7 @@
                 "Handle": {
                     "Ref": "waithandle"
                 },
-                "Timeout": 600
+                "Timeout": 1800
             }
         }
     },
