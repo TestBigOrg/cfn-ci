@@ -19,7 +19,7 @@
         }
     },
     "Resources": {
-        "Security": {
+        "security": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
                 "GroupDescription": "Allow atlas-server-app traffic",
@@ -39,7 +39,7 @@
                 ]
             }
         },
-        "WindowsEC2": {
+        "ec2": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "ImageId": {
@@ -53,7 +53,7 @@
                 },
                 "InstanceType": "c3.large",
                 "KeyName": "tilestream",
-                "SecurityGroupIds": [ { "Ref": "Security" } ],
+                "SecurityGroupIds": [ { "Ref": "security" } ],
                 "Tags": [ {
                     "Key": "Name",
                     "Value": { "Fn::Join": [ " - ", [
@@ -73,9 +73,26 @@
                     "@powershell -NoProfile -ExecutionPolicy unrestricted -Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" && SET PATH=%PATH%;%ALLUSERSPROFILE%\\chocolatey\\bin",
                     "call cinst curl",
                     { "Ref": "UserData" },
+                    { "Fn::Join": [ "", [ "cfn-signal.exe ", {"Fn::Base64":{"Ref":"waithandle"}} ] ] },
                     "</script>",
                     "<persist>true</persist>"
                 ] ] } }
+            }
+        },
+        "waithandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        },
+        "waitcondition": {
+            "DependsOn": [
+                "ec2"
+            ],
+            "Type": "AWS::CloudFormation::WaitCondition",
+            "Properties": {
+                "Count": 1,
+                "Handle": {
+                    "Ref": "waithandle"
+                },
+                "Timeout": 600
             }
         }
     },
