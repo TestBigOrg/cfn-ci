@@ -7,6 +7,12 @@
             "Type": "String",
             "AllowedValues" : ["win2012", "win2012-vs2014"]
         },
+        "InstanceType": {
+            "Description": "EC2 instance type",
+            "Type": "String",
+            "AllowedValues" : ["c3.large", "c3.xlarge"],
+            "Default": "c3.large"
+        },
         "UserData": {
             "Description": "Test script to run",
             "Type": "String",
@@ -51,7 +57,7 @@
                         "AMI"
                     ]
                 },
-                "InstanceType": "c3.large",
+                "InstanceType": { "Ref: "InstanceType" },
                 "KeyName": "tilestream",
                 "SecurityGroupIds": [ { "Ref": "security" } ],
                 "Tags": [ {
