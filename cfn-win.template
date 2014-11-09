@@ -57,7 +57,7 @@
                         "AMI"
                     ]
                 },
-                "InstanceType": { "Ref: "InstanceType" },
+                "InstanceType": { "Ref": "InstanceType" },
                 "KeyName": "tilestream",
                 "SecurityGroupIds": [ { "Ref": "security" } ],
                 "Tags": [ {
