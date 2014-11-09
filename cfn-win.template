@@ -10,7 +10,7 @@
         "InstanceType": {
             "Description": "EC2 instance type",
             "Type": "String",
-            "AllowedValues" : ["c3.large", "c3.xlarge"],
+            "AllowedValues" : ["c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge"],
             "Default": "c3.large"
         },
         "UserData": {
