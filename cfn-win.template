@@ -111,7 +111,7 @@
                 "AMI": "ami-8ce26ce4"
             },
             "win2012-vs2015": {
-                "AMI": "TODO"
+                "AMI": "ami-6dcd6806"
             }
         }
     }
