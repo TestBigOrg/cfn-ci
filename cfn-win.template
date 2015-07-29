@@ -5,7 +5,7 @@
         "OS": {
             "Description": "AMI to use",
             "Type": "String",
-            "AllowedValues" : ["win2012", "win2012-vs2014"]
+            "AllowedValues" : ["win2012", "win2012-vs2014", "win2012-vs2015"]
         },
         "InstanceType": {
             "Description": "EC2 instance type",
@@ -109,6 +109,9 @@
             },
             "win2012-vs2014": {
                 "AMI": "ami-8ce26ce4"
+            },
+            "win2012-vs2015": {
+                "AMI": "TODO"
             }
         }
     }
