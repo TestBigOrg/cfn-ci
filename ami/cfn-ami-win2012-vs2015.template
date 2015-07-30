@@ -44,7 +44,7 @@
                 "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
                     "<powershell>",
                     "([ADSI]\"WinNT://./Administrator\").SetPassword(\"Plato1234\")",
-                    "Invoke-WebRequest http://download.microsoft.com/download/0/B/C/0BC321A4-013F-479C-84E6-4A2F90B11269/vs_community.exe -OutFile C:\\Users\\Administrator\\Desktop\\vs_community.exe",
+                    "Invoke-WebRequest http://download.microsoft.com/download/D/E/5/DE5263E9-A58D-469A-BA16-14786E2E2B1C/wdexpress_full.exe -OutFile C:\\Users\\Administrator\\Desktop\\wdexpress_full.exe",
                     "</powershell>",
                     "<persist>true</persist>"
                 ] ] } }

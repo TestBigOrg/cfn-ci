@@ -69,7 +69,7 @@
                 "BlockDeviceMappings" : [
                    {
                       "DeviceName" : "/dev/sda1",
-                      "Ebs" : { "VolumeSize": "160" }
+                      "Ebs" : { "VolumeSize": "60" }
                    }
                 ],
                 "UserData": { "Fn::Base64": { "Fn::Join": [ "\r\n", [
@@ -111,7 +111,7 @@
                 "AMI": "ami-8ce26ce4"
             },
             "win2012-vs2015": {
-                "AMI": "ami-6dcd6806"
+                "AMI": "ami-13ab0e78"
             }
         }
     }
