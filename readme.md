@@ -25,6 +25,8 @@ OS         | AMI to test on (currently: `win2012`, `win2012-vs2014`, or `win2012
 UserData   | Test script to run
 GithubAccessToken | *Unused*: GitHub access token with repo:status scope
 
+To add a new AMI see the steps at https://github.com/mapbox/cfn-ci/pull/4#issue-98029857
+
 ### ami/cfn-ami-win2012-vs2014.template
 
 A CFN template for building a Windows 2012 + Visual Studio 2014 AMI. AMI creation must
