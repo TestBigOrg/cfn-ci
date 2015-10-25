@@ -5,7 +5,7 @@
         "OS": {
             "Description": "OS to test on",
             "Type": "String",
-            "AllowedValues" : ["centos7", "rhel7", "ubuntu1404", "rhel71"]
+            "AllowedValues" : ["centos7", "rhel7", "ubuntu1404", "rhel71", "amazon201509"]
         },
         "Label": {
             "Description": "Label for CI job when posted back to GitHub",
@@ -175,6 +175,9 @@
             },
             "ubuntu1404": {
                 "AMI": "ami-52a3153a"
+            },
+            "amazon201509": {
+                "AMI": "ami-e3106686"
             }
         }
     }
