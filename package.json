@@ -1,13 +1,13 @@
 {
-  "name": "cfn-ci",
-  "version": "0.0.4",
-  "description": "CF template for an EC2 that reports back to GitHub statuses API",
-  "main": "package.json",
-  "private": true,
+  "license": "BSD-2-Clause", 
+  "name": "cfn-ci", 
   "repository": {
-    "type": "git",
-    "url": "https://github.com/mapbox/cfn-ci.git"
-  },
-  "author": "Mapbox",
-  "license": "BSD"
+    "url": "https://github.com/mapbox/cfn-ci.git", 
+    "type": "git"
+  }, 
+  "author": "Mapbox", 
+  "private": true, 
+  "version": "0.0.4", 
+  "main": "package.json", 
+  "description": "CF template for an EC2 that reports back to GitHub statuses API"
 }
